@@ -1,6 +1,12 @@
 import React from "react";
 
-import { Refine, AuthProvider } from "@pankod/refine-core";
+import {  
+  AuthPage,
+  AuthBindings,
+  GitHubBanner,
+  Refine,
+  Authenticated,
+  ErrorComponent, } from "@pankod/refine-core";
 import {notificationProvider, RefineSnackbarProvider, CssBaseline, GlobalStyles,ReadyPage, ErrorComponent,} from "@pankod/refine-mui";
 import {AccountCircleOutlined,ChatBubbleOutline, PeopleAltOutlined, 
   StarOutlineRounded,VillaOutlined, Receipt, Inventory, PeopleAlt, Category, Warehouse} from "@mui/icons-material";
@@ -16,12 +22,17 @@ import {Login, Dashboard, Users, MyProfile, UserProfile,
 
 import dataProvider from "@pankod/refine-simple-rest";
 import { MuiInferencer } from "@pankod/refine-inferencer/mui";
-import routerProvider from "@pankod/refine-react-router-v6";
+import routerProvider, {
+  NavigateToResource,
+  CatchAllNavigate,
+  UnsavedChangesNotifier,
+} from "@pankod/refine-react-router-v6";
 import axios, { AxiosRequestConfig } from "axios";
 import { ColorModeContextProvider } from "contexts";
 import { Title, Sider, Layout, Header } from "components/layout";
 import { CredentialResponse } from "interfaces/google";
 import { parseJwt } from "utils/parse-jwt";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 
 const axiosInstance = axios.create();
 axiosInstance.interceptors.request.use((request: AxiosRequestConfig) => {
@@ -38,43 +49,112 @@ axiosInstance.interceptors.request.use((request: AxiosRequestConfig) => {
 });
 
 function App() {
-  const authProvider: AuthProvider = {
-    login: async ({ credential }: CredentialResponse) => {
-        const profileObj = credential ? parseJwt(credential) : null;
+  const authProvider: AuthBindings = {
+    // login: async ({ credential }: CredentialResponse) => {
+    //     const profileObj = credential ? parseJwt(credential) : null;
 
-        if (profileObj) {
-            const response = await fetch(
-                "http://localhost:8080/api/v1/users",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        name: profileObj.name,
-                        email: profileObj.email,
-                        avatar: profileObj.picture,
-                    }),
-                },
-            );
+    //     if (profileObj) {
+    //         const response = await fetch(
+    //             "http://localhost:8080/api/v1/users",
+    //             {
+    //                 method: "POST",
+    //                 headers: { "Content-Type": "application/json" },
+    //                 body: JSON.stringify({
+    //                     name: profileObj.name,
+    //                     email: profileObj.email,
+    //                     avatar: profileObj.picture,
+    //                 }),
+    //             },
+    //         );
 
-            const data = await response.json();
+    //         const data = await response.json();
 
-            if (response.status === 200) {
-                localStorage.setItem(
-                    "user",
-                    JSON.stringify({
-                        ...profileObj,
-                        avatar: profileObj.picture,
-                        userid: data._id,
-                    }),
-                );
-            } else {
-                return Promise.reject();
-            }
+    //         if (response.status === 200) {
+    //             localStorage.setItem(
+    //                 "user",
+    //                 JSON.stringify({
+    //                     ...profileObj,
+    //                     avatar: profileObj.picture,
+    //                     userid: data._id,
+    //                 }),
+    //             );
+    //         } else {
+    //             return Promise.reject();
+    //         }
+    //     }
+    //     localStorage.setItem("token", `${credential}`);
+
+    //     return Promise.resolve();
+    // },
+    login: async ({ providerName, email }) => {
+        if (providerName === "google") {
+            window.location.href =
+                "https://accounts.google.com/o/oauth2/v2/auth";
+            return {
+                success: true,
+            };
         }
-        localStorage.setItem("token", `${credential}`);
 
-        return Promise.resolve();
+        if (providerName === "github") {
+            window.location.href =
+                "https://github.com/login/oauth/authorize";
+            return {
+                success: true,
+            };
+        }
+
+        if (email) {
+            localStorage.setItem("email", email);
+            return {
+                success: true,
+                redirectTo: "/",
+            };
+        }
+
+        return {
+            success: false,
+            error: new Error("Email is wrong"),
+        };
     },
+    register: async ({ email, password }) => {
+        if (email && password) {
+            return {
+                success: true,
+                redirectTo: "/",
+            };
+        }
+        return {
+            success: false,
+            error: new Error("Email or password is wrong"),
+        };
+    },
+    updatePassword: async ({ password }) => {
+        if (password) {
+            //we can update password here
+            return {
+                success: true,
+                redirectTo: "/login",
+            };
+        }
+        return {
+            success: false,
+            error: new Error("password is wrong"),
+        };
+    },
+    forgotPassword: async ({ email }) => {
+        if (email) {
+            //we can send email with forgot password link here
+            return {
+                success: true,
+                redirectTo: "/login",
+            };
+        }
+        return {
+            success: false,
+            error: new Error("Email is wrong"),
+        };
+    },
+
     logout: () => {
         const token = localStorage.getItem("token");
 
@@ -109,6 +189,7 @@ function App() {
 };
 
   return (
+    <BrowserRouter>
     <ColorModeContextProvider>
       <CssBaseline />
       <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
@@ -198,9 +279,80 @@ function App() {
           authProvider={authProvider}
           LoginPage={Login}
           DashboardPage={Dashboard}
-        />
+          options={{
+            syncWithLocation: true,
+            warnWhenUnsavedChanges: true,
+        }}
+
+         >
+          <Routes>
+              <Route
+                  element={
+                      <Authenticated
+                          fallback={<CatchAllNavigate to="/login" />}
+                      >
+                          <Layout>
+                              <Outlet />
+                          </Layout>
+                      </Authenticated>
+                  }
+              >
+                  <Route
+                      index
+                      element={<NavigateToResource resource="invoices" />}
+                  />
+
+                  <Route path="/invoices">
+                      <Route index element={<AllInvoices />} />
+                      <Route path="create" element={<CreateInvoice />} />
+                      <Route path="show" element={<InvoiceDetails />} />
+                      <Route path="edit/:id" element={<EditInvoice />} />
+                  </Route>
+              </Route>
+
+              <Route
+                  element={
+                      <Authenticated fallback={<Outlet />}>
+                          <NavigateToResource resource="posts" />
+                      </Authenticated>
+                  }
+              >
+                  <Route
+                      path="/login"
+                      element={<AuthPage type="login" />}
+                  />
+                  <Route
+                      path="/register"
+                      element={<AuthPage type="register" />}
+                  />
+                  <Route
+                      path="/forgot-password"
+                      element={<AuthPage type="forgotPassword" />}
+                  />
+                  <Route
+                      path="/update-password"
+                      element={<AuthPage type="updatePassword" />}
+                  />
+                  <Route path="/example" element={<ExamplePage />} />
+              </Route>
+
+              <Route
+                  element={
+                      <Authenticated>
+                          <Layout>
+                              <Outlet />
+                          </Layout>
+                      </Authenticated>
+                  }
+              >
+                  <Route path="*" element={<ErrorComponent />} />
+              </Route>
+          </Routes>
+          <UnsavedChangesNotifier />
+        </Refine>
       </RefineSnackbarProvider>
     </ColorModeContextProvider>
+    </BrowserRouter>
   );
 }
 

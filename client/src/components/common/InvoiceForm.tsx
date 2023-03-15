@@ -25,6 +25,29 @@ import { Control, useFieldArray, useForm, useWatch, } from "react-hook-form";
     return <> {total}</>
   };
 
+
+
+//   function sumValue(payload: invoiceFormValues["invoiceDetails"]) {
+//     let sum = 0;
+  
+//     for (const field of payload) {
+//       sum = field.price * field.quantity;
+//     }
+  
+//     return sum;
+//   }
+//   function SumAmount({ control }: { control: Control<invoiceFormValues> }) {
+//     const fieldValues = useWatch({
+//       control,
+//       name: "invoiceDetails"
+//     });
+  
+//     return <p>{sumValue(fieldValues)}</p>;
+//   }
+
+
+
+
 const InvoiceForm = ({type, formLoading, onFinishHandler,  }: InvoiceFormProps) => {
 
     const {
@@ -265,16 +288,18 @@ const InvoiceForm = ({type, formLoading, onFinishHandler,  }: InvoiceFormProps) 
                                     defaultValue={field.quantity}
                                 />
                             </TableCell>
-                            <TableCell align="center" className='amount' {...register(`invoiceDetails.${index}.sum`)}>
+                            <TableCell align="center" className='amount' >
+                                 <input type="hidden" {...register(`invoiceDetails.${index}.sum`)} defaultValue={field.price * field.quantity}/>
                                 <Typography fontSize={18} fontWeight={400} textAlign='center' justifyContent='center'>
                                     {field.price * field.quantity}
+                                    {/* <SumAmout control={control} /> */}
                                 </Typography> 
                             </TableCell>
                             <TableCell align="center">
                                 <Clear onClick={() => remove(index)}/></TableCell>
                             </TableRow>
                         ))}
-                        <Button style={{margin:'5px', marginTop:'10px', border: '1px solid green'}} 
+                        <Button style={{margin:'5px', marginTop:'10px', border: '1px solid green', }} 
                             onClick={() => {append({ name: "",  price: 0, quantity: 0, sum:0})}}>
                                 Add Item
                         </Button>
@@ -282,28 +307,36 @@ const InvoiceForm = ({type, formLoading, onFinishHandler,  }: InvoiceFormProps) 
                         <TableRow >
                            <TableCell rowSpan={4} />
                            <TableCell colSpan={2}>Subtotal</TableCell>
-                           <TableCell align="right" {...register("subtotal")}>
-                            <Typography fontSize={20} fontWeight={500}> <Total control={control} />
-                            </Typography></TableCell>
+                           <TableCell align="right" >
+                           <input type="hidden" {...register('subtotal')}  />
+                                <Typography fontSize={20} fontWeight={500}> <Total control={control}/> </Typography>
+                            </TableCell>
                         </TableRow>
 
                         <TableRow>
                             <TableCell>Tax</TableCell>
                             <TableCell align="right">{`${(0.0 * 100).toFixed(0)} %`}</TableCell>
-                            <TableCell align="right" {...register("tax")}>{ccyFormat(0)}</TableCell>
+                            <TableCell align="right" >
+                                <input type="hidden" {...register('tax')}  />
+                                {ccyFormat(0)}  
+                            </TableCell>
                         </TableRow>
 
                         <TableRow>
                             <TableCell>Discount</TableCell>
                             <TableCell align="right">{`${(0.0 * 100).toFixed(0)} %`}</TableCell>
-                            <TableCell align="right" {...register("discount")}>{ccyFormat(0)}</TableCell>
+                            <TableCell align="right">
+                            <input type="hidden" {...register('discount')}  />
+                                {ccyFormat(0)}
+                            </TableCell>
                         </TableRow>
 
                         <TableRow>
                             <TableCell colSpan={2}>Total</TableCell>
-                            <TableCell align="right" {...register("total")}>
-                                <Typography fontSize={25} fontWeight={500} ><Total control={control} />
-                                </Typography></TableCell>
+                            <TableCell align="right">
+                            <input type="hidden" {...register('total')}  />
+                                <Typography fontSize={25} fontWeight={500} ><Total control={control} /></Typography>
+                            </TableCell>
                         </TableRow>
 
                         </TableBody>
