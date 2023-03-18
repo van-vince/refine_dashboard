@@ -1,15 +1,18 @@
 import { useState } from "react";
-import { useGetIdentity } from "@pankod/refine-core";
-import { FieldValues, useForm } from "@pankod/refine-react-hook-form";
-import { useNavigate } from "@pankod/refine-react-router-v6";
+import { useGetIdentity } from "@refinedev/core";
+import { useForm } from "@refinedev/react-hook-form";
+import { FieldValues } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 import ProductForm from "components/common/ProductForm";
-import { Create, Breadcrumb, ListButton } from "@pankod/refine-mui";
+import { Create, Breadcrumb, ListButton } from "@refinedev/mui";
 
 
 const CreateProduct = () => {
   const navigate = useNavigate();
-  const { data: user } = useGetIdentity();
+  const { data: user } = useGetIdentity({
+      v3LegacyAuthProviderCompatible: true
+  });
   const [productImage, setProductImage] = useState({ name: "", url: "" });
 
   const {

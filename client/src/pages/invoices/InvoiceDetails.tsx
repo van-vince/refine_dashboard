@@ -1,15 +1,34 @@
-import {  useDelete, useGetIdentity, useShow } from "@pankod/refine-core";
-import { useNavigate, useParams } from "@pankod/refine-react-router-v6";
+import { useDelete, useGetIdentity, useShow } from "@refinedev/core";
+import { useNavigate, useParams } from "react-router-dom";
 import { Delete, Email, Phone, Edit, Place} from "@mui/icons-material";
-import { Box, Typography, FormControl, FormHelperText, TextField, TextareaAutosize,
-        Stack, Select, MenuItem, Button, Table, TableHead, TableRow, TableBody, TableCell, Input,
-          Show, Breadcrumb
-} from "@pankod/refine-mui";
+import { Show, Breadcrumb } from "@refinedev/mui";
+
+import {
+    Box,
+    Typography,
+    FormControl,
+    FormHelperText,
+    TextField,
+    TextareaAutosize,
+    Stack,
+    Select,
+    MenuItem,
+    Button,
+    Table,
+    TableHead,
+    TableRow,
+    TableBody,
+    TableCell,
+    Input,
+} from "@mui/material";
+
 import { CustomButton } from "components";
 
 const InvoiceDetails = () => {
     const navigate = useNavigate();
-    const { data: user } = useGetIdentity();
+    const { data: user } = useGetIdentity({
+        v3LegacyAuthProviderCompatible: true
+    });
     const { queryResult } = useShow();
     const { mutate } = useDelete();
     const { id } = useParams();
@@ -32,7 +51,7 @@ const InvoiceDetails = () => {
                 },
                 {
                     onSuccess: () => {
-                        navigate("/invoices");
+                        navigate("/dashboard/invoices");
                     },
                 },
             );

@@ -1,10 +1,27 @@
 import React from "react";
 import { Add } from "@mui/icons-material";
-import { useTable } from "@pankod/refine-core";
-import { Box, Stack, Button, Typography, TextField, Select, MenuItem,
-        Table, TableHead, TableRow, TableBody, TableCell,tableCellClasses,TableContainer, Paper,styled
-} from "@pankod/refine-mui";
-import { useNavigate } from "@pankod/refine-react-router-v6";
+import { useTable } from "@refinedev/core";
+import { styled } from "@mui/material/styles";
+
+import {
+    Box,
+    Stack,
+    Button,
+    Typography,
+    TextField,
+    Select,
+    MenuItem,
+    Table,
+    TableHead,
+    TableRow,
+    TableBody,
+    TableCell,
+    tableCellClasses,
+    TableContainer,
+    Paper,
+} from "@mui/material";
+
+import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { CustomButton } from "components";
 //import { styled } from '@mui/material/styles';
@@ -42,8 +59,8 @@ const AllInvoices = () => {
         setCurrent,
         setPageSize,
         pageCount,
-        sorter,
-        setSorter,
+        sorters: sorter,
+        setSorters: setSorter,
         filters,
         setFilters,
     } = useTable();

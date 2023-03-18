@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { useGetIdentity } from "@pankod/refine-core";
-import { FieldValues, useForm, Control, FormProvider  } from "@pankod/refine-react-hook-form";
-import { useNavigate } from "@pankod/refine-react-router-v6";
+import { useGetIdentity } from "@refinedev/core";
+import { useForm } from "@refinedev/react-hook-form";
+import { FieldValues, Control, FormProvider } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 import InvoiceForm from "components/common/InvoiceForm";
-import { Create, Breadcrumb, ListButton } from "@pankod/refine-mui";
+import { Create, Breadcrumb, ListButton } from "@refinedev/mui";
 import { invoiceFormValues} from "interfaces/common";
 
 
 const CreateInvoice = () => {
   const navigate = useNavigate();
-  const { data: user } = useGetIdentity();
+  const { data: user } = useGetIdentity({
+      v3LegacyAuthProviderCompatible: true
+  });
   const methods = useForm();
 
   const {

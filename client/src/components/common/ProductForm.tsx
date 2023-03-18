@@ -1,3 +1,5 @@
+import { flexbox } from "@mui/system";
+
 import {
     Box,
     Typography,
@@ -9,8 +11,7 @@ import {
     Select,
     MenuItem,
     Button,
-    flexbox,
-} from "@pankod/refine-mui";
+} from "@mui/material";
 
 import { ProductFormProps } from "interfaces/common";
 import CustomButton from "./CustomButton";

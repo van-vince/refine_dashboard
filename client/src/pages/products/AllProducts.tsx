@@ -1,9 +1,10 @@
 import React from "react";
 import { Add } from "@mui/icons-material";
-import { useTable } from "@pankod/refine-core";
-import { Box, Stack, Button, Typography, TextField, Select, MenuItem, useDataGrid, DataGrid, ShowButton, GridColumns,
-} from "@pankod/refine-mui";
-import { useNavigate } from "@pankod/refine-react-router-v6";
+import { useTable } from "@refinedev/core";
+import { useDataGrid, ShowButton } from "@refinedev/mui";
+import { DataGrid, GridColumns } from "@mui/x-data-grid";
+import { Box, Stack, Button, Typography, TextField, Select, MenuItem } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { CustomButton } from "components";
 
@@ -16,8 +17,8 @@ const AllProducts = () => {
         setCurrent,
         setPageSize,
         pageCount,
-        sorter,
-        setSorter,
+        sorters: sorter,
+        setSorters: setSorter,
         filters,
         setFilters,
     } = useTable();
@@ -89,7 +90,7 @@ const AllProducts = () => {
                     <Box >
                         <Button style={{background:'#2ED480', width:'70px', color:'#fcfcfc', 
                         border:'none', padding:'4px', borderRadius:'5px'}} 
-                        onClick={()=>navigate(`/products/show/${row._id}`)}>
+                        onClick={()=>navigate(`/dashboard/products/show/${row._id}`)}>
                         View
                         </Button>
                     </Box>
@@ -206,7 +207,7 @@ const AllProducts = () => {
                         <Box  justifyContent="space-between" alignItems="center">
                         <CustomButton
                             title="Add Product"
-                            handleClick={() => navigate("/products/create")}
+                            handleClick={() => navigate("/dashboard/products/create")}
                             backgroundColor="#475be8"
                             color="#fcfcfc"
                             icon={<Add />}
@@ -312,7 +313,7 @@ export default AllProducts;
 //     [
 //         // categoryData,
 //         // userData
-        
+
 //     ]
 // );
 

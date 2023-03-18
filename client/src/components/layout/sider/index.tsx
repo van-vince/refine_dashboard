@@ -1,7 +1,33 @@
 import React, { useState } from "react";
-import {Box, Drawer, Sider as DefaultSider, ListItemButton, ListItemIcon,ListItemText, Collapse, Tooltip, Button,IconButton,MuiList,} from "@pankod/refine-mui";
+import { Sider as DefaultSider } from "@refinedev/mui";
+
+import {
+  Box,
+  Drawer,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Collapse,
+  Tooltip,
+  Button,
+  IconButton,
+} from "@mui/material";
+
+import { List as MuiList } from "@mui/material";
 import {ListOutlined,Logout, ExpandLess, ExpandMore, ChevronLeft, ChevronRight, MenuRounded, Dashboard,} from "@mui/icons-material";
-import {CanAccess, ITreeMenu, useIsExistAuthentication, useLogout, useTitle, useTranslate, useRouterContext, useMenu,useRefineContext,} from "@pankod/refine-core";
+
+import {
+  CanAccess,
+  ITreeMenu,
+  useIsExistAuthentication,
+  useLogout,
+  useTitle,
+  useTranslate,
+  useRouterContext,
+  useMenu,
+  useRefineContext,
+} from "@refinedev/core";
+import { useLink } from "@refinedev/core";
 
 import { Title as DefaultTitle } from "../title";
 
@@ -15,13 +41,15 @@ export const Sider: typeof DefaultSider = ({ render }) => {
   };
 
   const t = useTranslate();
-  const { Link } = useRouterContext();
+  const Link = useLink();
   const { hasDashboard } = useRefineContext();
   const translate = useTranslate();
 
   const { menuItems, selectedKey, defaultOpenKeys } = useMenu();
   const isExistAuthentication = useIsExistAuthentication();
-  const { mutate: mutateLogout } = useLogout();
+  const { mutate: mutateLogout } = useLogout({
+    v3LegacyAuthProviderCompatible: true
+  });
   const Title = useTitle();
 
   const [open, setOpen] = useState<{ [k: string]: any }>({});

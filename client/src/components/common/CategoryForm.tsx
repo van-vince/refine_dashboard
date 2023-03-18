@@ -1,5 +1,4 @@
-import { Box, Typography, FormControl, FormHelperText, TextField, Button,
-} from "@pankod/refine-mui";
+import { Box, Typography, FormControl, FormHelperText, TextField, Button } from "@mui/material";
 
 import { CategoryFormProps } from "interfaces/common";
 import CustomButton from "./CustomButton";

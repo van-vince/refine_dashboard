@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { useGetIdentity } from "@pankod/refine-core";
-import { FieldValues, useForm } from "@pankod/refine-react-hook-form";
+import { useGetIdentity } from "@refinedev/core";
+import { useForm } from "@refinedev/react-hook-form";
+import { FieldValues } from "react-hook-form";
 import ProductForm from "components/common/ProductForm";
-import { Edit, Breadcrumb } from "@pankod/refine-mui";
+import { Edit, Breadcrumb } from "@refinedev/mui";
 
 const EditProduct = () => {
-    const { data: user } = useGetIdentity();
+    const { data: user } = useGetIdentity({
+        v3LegacyAuthProviderCompatible: true
+    });
     const [productImage, setProductImage] = useState({ name: "", url: "" });
     const {
         refineCore: { onFinish, formLoading },

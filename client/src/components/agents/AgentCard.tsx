@@ -1,7 +1,7 @@
 import { EmailOutlined, LocationCity, Phone, Place } from "@mui/icons-material";
-import { useGetIdentity } from "@pankod/refine-core";
-import { Box, Stack, Typography } from "@pankod/refine-mui";
-import { Link } from "@pankod/refine-react-router-v6";
+import { useGetIdentity } from "@refinedev/core";
+import { Box, Stack, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 
 import { AgentCardProp, InfoBarProps } from "interfaces/agent";
 
@@ -26,11 +26,13 @@ const InfoBar = ({ icon, name }: InfoBarProps) => (
 );
 
 const AgentCard = ({ id, name, email, avatar, noOfProperties,}: AgentCardProp) => {
-    const { data: currentUser } = useGetIdentity();
+    const { data: currentUser } = useGetIdentity({
+        v3LegacyAuthProviderCompatible: true
+    });
 
     const generateLink = () => {
-        if (currentUser.email === email) return "/my-profile";
-        return `/agents/show/${id}`;
+        if (currentUser.email === email) return "/dashboard/my-profile";
+        return `dashboard/agents/show/${id}`;
     };
 
     return (

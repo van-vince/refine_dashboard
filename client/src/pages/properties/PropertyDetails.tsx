@@ -1,7 +1,6 @@
-/* eslint-disable no-restricted-globals */
-import { Typography, Box, Stack } from "@pankod/refine-mui";
-import { useDelete, useGetIdentity, useShow } from "@pankod/refine-core";
-import { useParams, useNavigate } from "@pankod/refine-react-router-v6";
+import { Typography, Box, Stack } from "@mui/material";
+import { useDelete, useGetIdentity, useShow } from "@refinedev/core";
+import { useParams, useNavigate } from "react-router-dom";
 import {
     ChatBubble,
     Delete,
@@ -21,7 +20,9 @@ function checkImage(url: any) {
 
 const PropertyDetails = () => {
     const navigate = useNavigate();
-    const { data: user } = useGetIdentity();
+    const { data: user } = useGetIdentity({
+        v3LegacyAuthProviderCompatible: true
+    });
     const { queryResult } = useShow();
     const { mutate } = useDelete();
     const { id } = useParams();
@@ -41,6 +42,7 @@ const PropertyDetails = () => {
     const isCurrentUser = user.email === propertyDetails.creator.email;
 
     const handleDeleteProperty = () => {
+        // eslint-disable-next-line no-restricted-globals
         const response = confirm(
             "Are you sure you want to delete this property?",
         );
@@ -52,7 +54,7 @@ const PropertyDetails = () => {
                 },
                 {
                     onSuccess: () => {
-                        navigate("/properties");
+                        navigate("/dashboard/properties");
                     },
                 },
             );
@@ -283,7 +285,7 @@ const PropertyDetails = () => {
                                 handleClick={() => {
                                     if (isCurrentUser) {
                                         navigate(
-                                            `/properties/edit/${propertyDetails._id}`,
+                                            `/dashboard/properties/edit/${propertyDetails._id}`,
                                         );
                                     }
                                 }}

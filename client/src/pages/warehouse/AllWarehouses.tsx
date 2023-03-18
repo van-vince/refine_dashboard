@@ -1,7 +1,7 @@
 import { Add } from "@mui/icons-material";
-import { useList } from "@pankod/refine-core";
-import { Box, Typography } from "@pankod/refine-mui";
-import { useNavigate } from "@pankod/refine-react-router-v6";
+import { useList } from "@refinedev/core";
+import { Box, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { CustomButton } from "components";
 import { WarehouseCard } from "components";
 
@@ -23,7 +23,7 @@ const Warehouses = () => {
             <Box  justifyContent="space-between" alignItems="center">
                 <CustomButton
                     title="Add Warehouse"
-                    handleClick={() => navigate("/warehouses/create")}
+                    handleClick={() => navigate("/dashboard/warehouses/create")}
                     backgroundColor="#475be8"
                     color="#fcfcfc"
                     icon={<Add />}

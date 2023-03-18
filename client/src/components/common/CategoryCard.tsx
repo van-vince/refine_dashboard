@@ -1,7 +1,7 @@
 import { Category, Phone, Place, Description, Inventory } from "@mui/icons-material";
-import { useGetIdentity } from "@pankod/refine-core";
-import { Box, Stack, Typography } from "@pankod/refine-mui";
-import { Link, useNavigate } from "@pankod/refine-react-router-v6";
+import { useGetIdentity } from "@refinedev/core";
+import { Box, Stack, Typography } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
 
 import { CategoryCardProps, CategoryBarProps } from "interfaces/category";
 
@@ -21,11 +21,13 @@ const CategoryBar = ({ icon, name }: CategoryBarProps) => (
 
 const CategoryCard = ({ id, name, description, email}: CategoryCardProps) => {
     const navigate = useNavigate()
-    const { data: currentUser } = useGetIdentity();
+    const { data: currentUser } = useGetIdentity({
+        v3LegacyAuthProviderCompatible: true
+    });
 
     const generateLink = () => {
         if (currentUser.email === email) return "Categories";
-        return `/categories/show/${id}`;
+        return `/dashboard/categories/show/${id}`;
     };
 
     return (

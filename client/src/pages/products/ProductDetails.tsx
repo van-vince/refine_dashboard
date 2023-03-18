@@ -1,7 +1,7 @@
-/* eslint-disable no-restricted-globals */
-import { Typography, Box, Stack, Show, Breadcrumb} from "@pankod/refine-mui";
-import { useDelete, useGetIdentity, useShow } from "@pankod/refine-core";
-import { useParams, useNavigate } from "@pankod/refine-react-router-v6";
+import { Show, Breadcrumb } from "@refinedev/mui";
+import { Typography, Box, Stack } from "@mui/material";
+import { useDelete, useGetIdentity, useShow } from "@refinedev/core";
+import { useParams, useNavigate } from "react-router-dom";
 import {
     ChatBubble,
     Delete,
@@ -21,7 +21,9 @@ function checkImage(url: any) {
 
 const PoductDetails = () => {
     const navigate = useNavigate();
-    const { data: user } = useGetIdentity();
+    const { data: user } = useGetIdentity({
+        v3LegacyAuthProviderCompatible: true
+    });
     const { queryResult } = useShow();
     const { mutate } = useDelete();
     const { id } = useParams();
@@ -41,6 +43,7 @@ const PoductDetails = () => {
     const isCurrentUser = user.email === poductDetails.creator.email;
 
     const handleDeletePoduct = () => {
+        // eslint-disable-next-line no-restricted-globals
         const response = confirm(
             "Are you sure you want to delete this poduct?",
         );
@@ -52,7 +55,7 @@ const PoductDetails = () => {
                 },
                 {
                     onSuccess: () => {
-                        navigate("/products");
+                        navigate("/dashboard/products");
                     },
                 },
             );
@@ -262,7 +265,7 @@ const PoductDetails = () => {
                                 handleClick={() => {
                                     if (isCurrentUser) {
                                         navigate(
-                                            `/products/edit/${poductDetails._id}`,
+                                            `/dashboard/products/edit/${poductDetails._id}`,
                                         );
                                     }
                                 }}

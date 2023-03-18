@@ -1,9 +1,10 @@
 import React from "react";
 import { Add } from "@mui/icons-material";
-import { useTable } from "@pankod/refine-core";
-import { Box, Stack, Button, Typography, TextField, Select, MenuItem, useDataGrid, DataGrid, ShowButton, GridColumns,
-} from "@pankod/refine-mui";
-import { useNavigate } from "@pankod/refine-react-router-v6";
+import { useTable } from "@refinedev/core";
+import { useDataGrid, ShowButton } from "@refinedev/mui";
+import { DataGrid, GridColumns } from "@mui/x-data-grid";
+import { Box, Stack, Button, Typography, TextField, Select, MenuItem } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { CustomButton } from "components";
 
@@ -16,8 +17,8 @@ const AllCustomers = () => {
         setCurrent,
         setPageSize,
         pageCount,
-        sorter,
-        setSorter,
+        sorters: sorter,
+        setSorters: setSorter,
         filters,
         setFilters,
     } = useTable();
@@ -58,7 +59,7 @@ const AllCustomers = () => {
                     <Box >
                         <Button style={{background:'#2ED480', width:'70px', color:'#fcfcfc', 
                             border:'none', padding:'4px', borderRadius:'5px'}} 
-                            onClick={()=>navigate(`/customers/show/${row._id}`)}>
+                            onClick={()=>navigate(`/dashboard/customers/show/${row._id}`)}>
                             View
                         </Button>
                     </Box>

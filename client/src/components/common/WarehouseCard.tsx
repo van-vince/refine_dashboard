@@ -1,7 +1,7 @@
 import { Category, Phone, Place, Description, Inventory } from "@mui/icons-material";
-import { useGetIdentity } from "@pankod/refine-core";
-import { Box, Stack, Typography } from "@pankod/refine-mui";
-import { Link, useNavigate } from "@pankod/refine-react-router-v6";
+import { useGetIdentity } from "@refinedev/core";
+import { Box, Stack, Typography } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
 import warehouselogo from '../assets/warehouselogo.png'
 
 import { WarehouseCardProps, WarehouseBarProps } from "interfaces/warehouse";
@@ -22,11 +22,13 @@ const WarehouseBar = ({ icon, name }: WarehouseBarProps) => (
 
 const WarehouseCard = ({ id, name, location, email}: WarehouseCardProps) => {
     const navigate = useNavigate()
-    const { data: currentUser } = useGetIdentity();
+    const { data: currentUser } = useGetIdentity({
+        v3LegacyAuthProviderCompatible: true
+    });
 
     const generateLink = () => {
         if (currentUser.email === email) return "Warehouse";
-        return `/warehouses/show/${id}`;
+        return `/dashboard/warehouses/show/${id}`;
     };
 
     return (

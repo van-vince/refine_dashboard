@@ -1,15 +1,15 @@
 import React from "react";
-import { useRouterContext, TitleProps } from "@pankod/refine-core";
-import { Button } from "@pankod/refine-mui";
+import { useLink, TitleProps } from "@refinedev/core";
+import { Button } from "@mui/material";
 
 import {logo, yariga} from 'assets'
 
 export const Title: React.FC<TitleProps> = ({ collapsed }) => {
-  const { Link } = useRouterContext();
+  const Link = useLink();
 
   return (
     <Button fullWidth variant="text" disableRipple>
-      <Link to="/">
+      <Link to="/dashboard">
         {collapsed ? (
           <img src={logo} alt="yariga" width="28px" />
         ) : (

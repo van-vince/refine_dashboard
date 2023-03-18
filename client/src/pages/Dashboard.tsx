@@ -1,5 +1,5 @@
-import { useList } from "@pankod/refine-core";
-import { Typography, Box, Stack } from "@pankod/refine-mui";
+import { useList } from "@refinedev/core";
+import { Typography, Box, Stack } from "@mui/material";
 import {
   PieChart,
   PropertyReferrals,
@@ -10,12 +10,11 @@ import {
 const Dashboard = () => {
 
   const { data, isLoading, isError } = useList({
-    resource: "properties",
-    config: {
-        pagination: {
-            pageSize: 4,
-        },
-    },
+      resource: "properties",
+
+      pagination: {
+          pageSize: 4,
+      }
   });
 
   const latestProperties = data?.data ?? [];

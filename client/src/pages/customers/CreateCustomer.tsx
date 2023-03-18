@@ -1,15 +1,18 @@
 import { useState } from "react";
-import { useGetIdentity } from "@pankod/refine-core";
-import { FieldValues, useForm } from "@pankod/refine-react-hook-form";
-import { useNavigate } from "@pankod/refine-react-router-v6";
+import { useGetIdentity } from "@refinedev/core";
+import { useForm } from "@refinedev/react-hook-form";
+import { FieldValues } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 import CustomerForm from "components/common/CustomerForm";
-import { Create, ListButton, Breadcrumb } from "@pankod/refine-mui";
+import { Create, ListButton, Breadcrumb } from "@refinedev/mui";
 
 
 const CreateCustomer = () => {
   const navigate = useNavigate();
-  const { data: user } = useGetIdentity();
+  const { data: user } = useGetIdentity({
+      v3LegacyAuthProviderCompatible: true
+  });
 
 
   const {

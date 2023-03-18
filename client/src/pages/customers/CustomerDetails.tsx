@@ -1,12 +1,15 @@
-import {  useDelete, useGetIdentity, useShow } from "@pankod/refine-core";
-import { useNavigate, useParams } from "@pankod/refine-react-router-v6";
+import { useDelete, useGetIdentity, useShow } from "@refinedev/core";
+import { useNavigate, useParams } from "react-router-dom";
 import { Delete, Email, Phone, Edit, Place} from "@mui/icons-material";
-import { Box, Stack, Typography, Show, Breadcrumb, } from "@pankod/refine-mui";
+import { Show, Breadcrumb } from "@refinedev/mui";
+import { Box, Stack, Typography } from "@mui/material";
 import { CustomButton } from "components";
 
 const CustomerDetails = () => {
     const navigate = useNavigate();
-    const { data: user } = useGetIdentity();
+    const { data: user } = useGetIdentity({
+        v3LegacyAuthProviderCompatible: true
+    });
     const { queryResult } = useShow();
     const { mutate } = useDelete();
     const { id } = useParams();
@@ -28,7 +31,7 @@ const CustomerDetails = () => {
                 },
                 {
                     onSuccess: () => {
-                        navigate("/customers");
+                        navigate("/dashboard/customers");
                     },
                 },
             );
@@ -112,7 +115,7 @@ const CustomerDetails = () => {
                                 color="#FCFCFC"
                                 //fullWidth
                                 icon={ <Edit/>}
-                                handleClick={() => navigate(`/customers/edit/${customerDetails._id}`)}
+                                handleClick={() => navigate(`/dashboard/customers/edit/${customerDetails._id}`)}
                             />
                             <CustomButton
                                 title= "Delete"

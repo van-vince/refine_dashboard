@@ -1,7 +1,7 @@
 import { Add } from "@mui/icons-material";
-import { useList } from "@pankod/refine-core";
-import { Box, Typography } from "@pankod/refine-mui";
-import { useNavigate } from "@pankod/refine-react-router-v6";
+import { useList } from "@refinedev/core";
+import { Box, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { CustomButton } from "components";
 import { CategoryCard } from "components";
 
@@ -23,7 +23,7 @@ const Categories = () => {
             <Box  justifyContent="space-between" alignItems="center">
                 <CustomButton
                     title="Add Category"
-                    handleClick={() => navigate("/categories/create")}
+                    handleClick={() => navigate("/dashboard/categories/create")}
                     backgroundColor="#475be8"
                     color="#fcfcfc"
                     icon={<Add />}

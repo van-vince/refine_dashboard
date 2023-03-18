@@ -1,14 +1,17 @@
 import { useState } from "react";
-import { useGetIdentity } from "@pankod/refine-core";
-import { FieldValues, useForm } from "@pankod/refine-react-hook-form";
-import { useNavigate } from "@pankod/refine-react-router-v6";
-import { Create, ListButton, Breadcrumb} from "@pankod/refine-mui";
+import { useGetIdentity } from "@refinedev/core";
+import { useForm } from "@refinedev/react-hook-form";
+import { FieldValues } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { Create, ListButton, Breadcrumb } from "@refinedev/mui";
 import WarehouseForm from "components/common/WarehouseForm";
 
 
 const CreateWarehouse = () => {
   const navigate = useNavigate();
-  const { data: user } = useGetIdentity();
+  const { data: user } = useGetIdentity({
+      v3LegacyAuthProviderCompatible: true
+  });
 
 
   const {

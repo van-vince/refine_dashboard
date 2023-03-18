@@ -1,13 +1,13 @@
 import React from "react";
+import {  Refine, Authenticated, AuthBindings} from "@refinedev/core";
 
-import {  
+import {
+  notificationProvider, 
+  RefineSnackbarProvider,   
   AuthPage,
-  AuthBindings,
-  GitHubBanner,
-  Refine,
-  Authenticated,
-  ErrorComponent, } from "@pankod/refine-core";
-import {notificationProvider, RefineSnackbarProvider, CssBaseline, GlobalStyles,ReadyPage, ErrorComponent,} from "@pankod/refine-mui";
+  ErrorComponent
+}from "@refinedev/mui";
+import { CssBaseline, GlobalStyles, FormControlLabel, Checkbox} from "@mui/material";
 import {AccountCircleOutlined,ChatBubbleOutline, PeopleAltOutlined, 
   StarOutlineRounded,VillaOutlined, Receipt, Inventory, PeopleAlt, Category, Warehouse} from "@mui/icons-material";
 
@@ -20,72 +20,27 @@ import {Login, Dashboard, Users, MyProfile, UserProfile,
         AllInvoices,InvoiceDetails,EditInvoice, CreateInvoice,
       } from './pages'
 
-import dataProvider from "@pankod/refine-simple-rest";
-import { MuiInferencer } from "@pankod/refine-inferencer/mui";
-import routerProvider, {
+import dataProvider from "@refinedev/simple-rest";
+import { MuiInferencer } from "@refinedev/inferencer/mui";
+import routerBindings, {
   NavigateToResource,
   CatchAllNavigate,
   UnsavedChangesNotifier,
-} from "@pankod/refine-react-router-v6";
-import axios, { AxiosRequestConfig } from "axios";
+} from "@refinedev/react-router-v6";
 import { ColorModeContextProvider } from "contexts";
 import { Title, Sider, Layout, Header } from "components/layout";
-import { CredentialResponse } from "interfaces/google";
-import { parseJwt } from "utils/parse-jwt";
+
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { authProvider } from "./pages/Auth/authProvider";
 
-const axiosInstance = axios.create();
-axiosInstance.interceptors.request.use((request: AxiosRequestConfig) => {
-  const token = localStorage.getItem("token");
-  if (request.headers) {
-    request.headers["Authorization"] = `Bearer ${token}`;
-  } else {
-    request.headers = {
-      Authorization: `Bearer ${token}`,
-    };
-  }
+import { useFormContext } from "react-hook-form";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import GoogleIcon from "@mui/icons-material/Google";
 
-  return request;
-});
 
 function App() {
+
   const authProvider: AuthBindings = {
-    // login: async ({ credential }: CredentialResponse) => {
-    //     const profileObj = credential ? parseJwt(credential) : null;
-
-    //     if (profileObj) {
-    //         const response = await fetch(
-    //             "http://localhost:8080/api/v1/users",
-    //             {
-    //                 method: "POST",
-    //                 headers: { "Content-Type": "application/json" },
-    //                 body: JSON.stringify({
-    //                     name: profileObj.name,
-    //                     email: profileObj.email,
-    //                     avatar: profileObj.picture,
-    //                 }),
-    //             },
-    //         );
-
-    //         const data = await response.json();
-
-    //         if (response.status === 200) {
-    //             localStorage.setItem(
-    //                 "user",
-    //                 JSON.stringify({
-    //                     ...profileObj,
-    //                     avatar: profileObj.picture,
-    //                     userid: data._id,
-    //                 }),
-    //             );
-    //         } else {
-    //             return Promise.reject();
-    //         }
-    //     }
-    //     localStorage.setItem("token", `${credential}`);
-
-    //     return Promise.resolve();
-    // },
     login: async ({ providerName, email }) => {
         if (providerName === "google") {
             window.location.href =
@@ -107,86 +62,105 @@ function App() {
             localStorage.setItem("email", email);
             return {
                 success: true,
-                redirectTo: "/",
+                redirectTo: "/dashboard",
             };
         }
 
         return {
             success: false,
-            error: new Error("Email is wrong"),
+            error: new Error("Invalid email or password"),
         };
     },
-    register: async ({ email, password }) => {
-        if (email && password) {
+    register: async (params) => {
+        if (params.email && params.password) {
+            localStorage.setItem("email", params.email);
             return {
                 success: true,
-                redirectTo: "/",
+                redirectTo: "/dashboard",
             };
         }
         return {
             success: false,
-            error: new Error("Email or password is wrong"),
+            error: new Error("Invalid email or password"),
         };
     },
-    updatePassword: async ({ password }) => {
-        if (password) {
+    updatePassword: async (params) => {
+        if (params.newPassword) {
             //we can update password here
             return {
                 success: true,
-                redirectTo: "/login",
             };
         }
         return {
             success: false,
-            error: new Error("password is wrong"),
+            error: new Error("Invalid password"),
         };
     },
-    forgotPassword: async ({ email }) => {
-        if (email) {
-            //we can send email with forgot password link here
+    forgotPassword: async (params) => {
+        if (params.email) {
+            //we can send email with reset password link here
             return {
                 success: true,
-                redirectTo: "/login",
             };
         }
         return {
             success: false,
-            error: new Error("Email is wrong"),
+            error: new Error("Invalid email"),
         };
     },
-
-    logout: () => {
-        const token = localStorage.getItem("token");
-
-        if (token && typeof window !== "undefined") {
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            axios.defaults.headers.common = {};
-            window.google?.accounts.id.revoke(token, () => {
-                return Promise.resolve();
-            });
-        }
-
-        return Promise.resolve();
+    logout: async () => {
+        localStorage.removeItem("email");
+        return {
+            success: true,
+            redirectTo: "/login",
+        };
     },
-    checkError: () => Promise.resolve(),
-    checkAuth: async () => {
-        const token = localStorage.getItem("token");
-
-        if (token) {
-            return Promise.resolve();
-        }
-        return Promise.reject();
+    onError: async (error) => {
+        console.error(error);
+        return { error };
     },
+    check: async () =>
+        localStorage.getItem("email")
+            ? {
+                  authenticated: true,
+                }
+              : {
+                    authenticated: false,
+                    error: new Error("Not authenticated"),
+                    logout: true,
+                    redirectTo: "/login",
+                },
+      getPermissions: async () => ["admin"],
+      getIdentity: async () => ({
+          id: 1,
+          name: "Jane Doe",
+          avatar: "https://unsplash.com/photos/IWLOvomUmWU/download?force=true&w=640",
+      }),
+  };
 
-    getPermissions: () => Promise.resolve(),
-    getUserIdentity: async () => {
-        const user = localStorage.getItem("user");
-        if (user) {
-            return Promise.resolve(JSON.parse(user));
-        }
-    },
-};
+  const RememeberMe = () => {
+      const { register } = useFormContext();
+
+      return (
+          <FormControlLabel
+              sx={{
+                  span: {
+                      fontSize: "12px",
+                      color: "text.secondary",
+                  },
+              }}
+              color="secondary"
+              control={
+                  <Checkbox
+                      size="small"
+                      id="rememberMe"
+                      {...register("rememberMe")}
+                  />
+              }
+              label="Remember me"
+          />
+      );
+  };
 
   return (
     <BrowserRouter>
@@ -197,157 +171,268 @@ function App() {
         <Refine
           dataProvider={dataProvider("http://localhost:8080/api/v1")}
           notificationProvider={notificationProvider}
-          ReadyPage={ReadyPage}
-          catchAll={<ErrorComponent />}
           resources={[
             {
               name: "invoices",
-              list: AllInvoices,
-              show: InvoiceDetails,
-              create: CreateInvoice,
-              edit: EditInvoice,
+              list: "/dashboard/invoices",
+              create: "/dashboard/invoices/create",
+              edit: "/dashboard/invoices/edit/:id",
+              show: "/dashboard/invoices/show/:id",
+              meta: {canDelete: true, },
               icon: <Receipt />,
+              },
+          {
+            name: "products",
+            list: "/dashboard/products",
+            create: "/dashboard/products/create",
+            edit: "/dashboard/products/edit/:id",
+            show: "/dashboard/products/show/:id",
+            meta: {canDelete: true,},
+            icon: <Inventory />,
           },
-            {
-              name: "products",
-              list: AllProducts,
-              show: ProductDetails,
-              create: CreateProduct,
-              edit: EditProduct,
-              icon: <Inventory />,
+          {
+            name: "properties",
+            list: "/dashboard/properties",
+            create:"/dashboard/properties/create",
+            edit: "/dashboard/properties/edit/:id",
+            show: "/dashboard/properties/show/:id",
+            meta: {canDelete: true,},
+            icon: <VillaOutlined />,
           },
-            {
-              name: "properties",
-              list: AllProperties,
-              show: PropertyDetails,
-              create: CreateProperty,
-              edit: EditProperty,
-              icon: <VillaOutlined />,
+           {
+            name: "customers",
+            list: "/dashboard/customers",
+            create:"/dashboard/customers/create",
+            edit: "/dashboard/customers/edit/:id",
+            show: "/dashboard/customers/show/:id",
+            meta: {canDelete: true,},
+            icon: <PeopleAlt />,
           },
-            {
-              name: "customers",
-              list: AllCustomers,
-              show: CustomerDetails,
-              create: CreateCustomer,
-              edit: EditCustomer,
-              icon: <PeopleAlt />,
+          {
+            name: "categories",
+            list: "/dashboard/categories",
+            create:"/dashboard/categories/create",
+            edit: "/dashboard/categories/edit/:id",
+            show: "/dashboard/categories/show/:id",
+            meta: { canDelete: true,},
+            icon: <Category />,
           },
-            {
-              name: "categories",
-              list: AllCategories,
-              show: CategoryDetails,
-              create: CreateCategory,
-              edit: EditCategory,
-              icon: <Category />,
-          },
-            {
-              name: "warehouses",
-              list: AllWarehouses,
-              show: WarehouseDetails,
-              create: CreateWarehouse,
-              edit: EditWarehouse,
-              icon: <Warehouse />,
+          {
+            name: "warehouses",
+            list: "/dashboard/warehouses",
+            create:"/dashboard/warehouses/create",
+            edit: "/dashboard/warehouses/edit/:id",
+            show: "/dashboard/warehouses/show/:id",
+            meta: {canDelete: true,},
+            icon: <Warehouse />,
           },
           {
             name: "users",
-            list: Users,
-            show: UserProfile,
+            list: "/dashboard/users",
+            create:"/dashboard/users/create",
+            edit: "/dashboard/users/edit/:id",
+            show: "/dashboard/users/show/:id",
+            meta: {canDelete: true,},
             icon: <PeopleAltOutlined />,
-        },
+          },
           {
               name: "reviews",
-              list: Dashboard,
+              list: '/dashboard',
               icon: <StarOutlineRounded />,
           },
           {
               name: "messages",
-              list: Dashboard,
+              list: '/dashboar',
               icon: <ChatBubbleOutline />,
           },
           {
               name: "my-profile",
               options: { label: "My Profile " },
-              list: MyProfile,
+              list: '/dashboard/MyProfile',
               icon: <AccountCircleOutlined />,
+
           },
           ]}
-          Title={Title}
-          Sider={Sider}
-          Layout={Layout}
-          Header={Header}
-          routerProvider={routerProvider}
+          routerProvider={routerBindings}
           authProvider={authProvider}
-          LoginPage={Login}
-          DashboardPage={Dashboard}
           options={{
             syncWithLocation: true,
             warnWhenUnsavedChanges: true,
         }}
 
          >
-          <Routes>
-              <Route
-                  element={
-                      <Authenticated
-                          fallback={<CatchAllNavigate to="/login" />}
-                      >
-                          <Layout>
-                              <Outlet />
-                          </Layout>
-                      </Authenticated>
-                  }
-              >
-                  <Route
-                      index
-                      element={<NavigateToResource resource="invoices" />}
-                  />
+              <Routes>
+                
+               <Route
+                    element={
+                        <Authenticated
+                            fallback={<CatchAllNavigate to="/login" />}
+                        >
+                            <Layout 
 
-                  <Route path="/invoices">
-                      <Route index element={<AllInvoices />} />
-                      <Route path="create" element={<CreateInvoice />} />
-                      <Route path="show" element={<InvoiceDetails />} />
-                      <Route path="edit/:id" element={<EditInvoice />} />
-                  </Route>
-              </Route>
+                            >
+                                <Outlet />
+                            </Layout>
+                        </Authenticated>
+                    }
+                    >
+                    {/* <Route path="/" element={''} /> */}
+                    <Route path="/dashboard" 
+                      element={<Dashboard/>} 
+                      />
+
+                    <Route path="/dashboard/invoices">
+                        <Route index element={<AllInvoices />} />
+                        <Route path="create" element={<CreateInvoice />} />
+                        <Route path="show/:id" element={<InvoiceDetails />} />
+                        <Route path="edit/:id" element={<EditInvoice />} />
+                    </Route>
+                    <Route path="/dashboard/products">
+                        <Route index element={<AllProducts />} />
+                        <Route path="create" element={<CreateProduct />} />
+                        <Route path="show/:id" element={<ProductDetails />} />
+                        <Route path="edit/:id" element={<EditProduct />} />
+                    </Route>
+                    <Route path="/dashboard/customers">
+                        <Route index element={<AllCustomers />} />
+                        <Route path="create" element={<CreateCustomer />} />
+                        <Route path="show/:id" element={<CustomerDetails />} />
+                        <Route path="edit/:id" element={<EditCustomer />} />
+                    </Route>
+                    <Route path="/dashboard/categories">
+                        <Route index element={<AllCategories />} />
+                        <Route path="create" element={<CreateCategory />} />
+                        <Route path="show/:id" element={<CategoryDetails />} />
+                        <Route path="edit/:id" element={<EditCategory />} />
+                    </Route>
+                    <Route path="/dashboard/warehouses">
+                        <Route index element={<AllWarehouses />} />
+                        <Route path="create" element={<CreateWarehouse />} />
+                        <Route path="show/:id" element={<WarehouseDetails />} />
+                        <Route path="edit/:id" element={<EditWarehouse />} />
+                    </Route>
+                    <Route path="/dashboard/users">
+                        <Route index element={<Users />} />
+                        {/* <Route path="create" element={<CreateUser />} /> */}
+                        <Route path="show/:id" element={<UserProfile />} />
+                        {/* <Route path="edit/:id" element={<EditUser />} /> */}
+                    </Route>
+                    <Route path="/dashboard/my-profile">
+                        <Route index element={<MyProfile />} />
+                        <Route path="create" element={''} />
+                        <Route path="show/:id" element={''} />
+                        <Route path="edit/:id" element={''} />
+                    </Route>
+                    <Route path="/dashboard/properties">
+                        <Route index element={<AllProperties />} />
+                        <Route path="create" element={<CreateProperty />} />
+                        <Route path="show/:id" element={<PropertyDetails />} />
+                        <Route path="edit/:id" element={<EditProperty />} />
+                    </Route>
+                    <Route path="/dashboard/warehouses">
+                        <Route index element={<AllWarehouses />} />
+                        <Route path="create" element={<CreateWarehouse />} />
+                        <Route path="show/:id" element={<WarehouseDetails />} />
+                        <Route path="edit/:id" element={<EditWarehouse />} />
+                    </Route>
+
+                    </Route>
+                <Route
+                  element={
+                    <Authenticated fallback={<Outlet />}>
+                     <CatchAllNavigate to="/dashboard" />
+                    </Authenticated>
+                  }
+                >
 
               <Route
-                  element={
-                      <Authenticated fallback={<Outlet />}>
-                          <NavigateToResource resource="posts" />
-                      </Authenticated>
-                  }
-              >
-                  <Route
-                      path="/login"
-                      element={<AuthPage type="login" />}
+              path="/login"
+              element={
+                  <AuthPage
+                      type="login"
+                      rememberMe={<RememeberMe />}
+                      providers={[
+                          {
+                              name: "google",
+                              label: "Sign in with Google",
+                              icon: (
+                                  <GoogleIcon
+                                      style={{
+                                          fontSize: 24,
+                                      }}
+                                  />
+                              ),
+                          },
+                          {
+                              name: "github",
+                              label: "Sign in with GitHub",
+                              icon: (
+                                  <GitHubIcon
+                                      style={{
+                                          fontSize: 24,
+                                      }}
+                                  />
+                              ),
+                          },
+                      ]}
                   />
-                  <Route
-                      path="/register"
-                      element={<AuthPage type="register" />}
-                  />
-                  <Route
-                      path="/forgot-password"
-                      element={<AuthPage type="forgotPassword" />}
-                  />
-                  <Route
-                      path="/update-password"
-                      element={<AuthPage type="updatePassword" />}
-                  />
-                  <Route path="/example" element={<ExamplePage />} />
-              </Route>
-
+              }
+              />
               <Route
+              path="/register"
+              element={
+                  <AuthPage
+                      type="register"
+                      providers={[
+                          {
+                              name: "google",
+                              label: "Sign in with Google",
+                              icon: (
+                                  <GoogleIcon
+                                      style={{
+                                          fontSize: 24,
+                                      }}
+                                  />
+                              ),
+                          },
+                          {
+                              name: "github",
+                              label: "Sign in with GitHub",
+                              icon: (
+                                  <GitHubIcon
+                                      style={{
+                                          fontSize: 24,
+                                      }}
+                                  />
+                              ),
+                          },
+                      ]}
+                  />
+              }
+              />
+              <Route
+              path="/forgot-password"
+              element={<AuthPage type="forgotPassword" />}
+              />
+              <Route
+              path="/update-password"
+              element={<AuthPage type="updatePassword" />}
+              />
+              </Route> 
+
+                <Route
                   element={
-                      <Authenticated>
-                          <Layout>
-                              <Outlet />
-                          </Layout>
-                      </Authenticated>
+                    <Authenticated>
+                      <Layout >
+                        <Outlet />
+                      </Layout>
+                    </Authenticated>
                   }
-              >
+                >
                   <Route path="*" element={<ErrorComponent />} />
-              </Route>
-          </Routes>
+                </Route>
+              </Routes>
+
           <UnsavedChangesNotifier />
         </Refine>
       </RefineSnackbarProvider>
@@ -356,4 +441,12 @@ function App() {
   );
 }
 
+
 export default App;
+
+
+
+
+
+
+

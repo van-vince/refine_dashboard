@@ -1,13 +1,6 @@
 import { Place } from "@mui/icons-material";
-import { Link } from "@pankod/refine-react-router-v6";
-import {
-    Typography,
-    Box,
-    Card,
-    CardMedia,
-    CardContent,
-    Stack,
-} from "@pankod/refine-mui";
+import { Link } from "react-router-dom";
+import { Typography, Box, Card, CardMedia, CardContent, Stack } from "@mui/material";
 
 import { PropertyCardProps } from "interfaces/property";
 
@@ -21,7 +14,7 @@ const PropertyCard = ({
     return (
         <Card
             component={Link}
-            to={`/properties/show/${id}`}
+            to={`/dashboard/properties/show/${id}`}
             sx={{
                 maxWidth: "330px",
                 padding: "10px",
